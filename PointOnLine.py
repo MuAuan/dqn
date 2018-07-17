@@ -14,7 +14,7 @@ class PointOnLine(gym.core.Env):
 
     # 各stepごとに呼ばれる
     # actionを受け取り、次のstateとreward、episodeが終了したかどうかを返すように実装
-    def _step(self, action):
+    def step(self, action):
         # actionを受け取り、次のstateを決定
         dt = 0.1
         acc = (action - 1) * 0.1
@@ -39,7 +39,7 @@ class PointOnLine(gym.core.Env):
         return np.array([self._pos, self._vel]), reward, done, {}
 
     # 各episodeの開始時に呼ばれ、初期stateを返すように実装
-    def _reset(self):
+    def reset(self):
         # 初期stateは、位置はランダム、速度ゼロ
         self._pos = np.random.rand()*2 - 1
         self._vel = 0.0
@@ -73,16 +73,16 @@ print(model.summary())
 # experience replay用のmemory
 memory = SequentialMemory(limit=50000, window_length=1)
 # 行動方策はオーソドックスなepsilon-greedy。ほかに、各行動のQ値によって確率を決定するBoltzmannQPolicyが利用可能
-#policy = EpsGreedyQPolicy(eps=0.1)
-policy = BoltzmannQPolicy() 
-#dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=100,
-#               target_model_update=1e-2, policy=policy)
+policy = EpsGreedyQPolicy(eps=0.1)
+#policy = BoltzmannQPolicy() 
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
+#dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
+#               target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-#history = dqn.fit(env, nb_steps=50000, visualize=False, verbose=2, nb_max_episode_steps=300)
-history = dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
+history = dqn.fit(env, nb_steps=50000, visualize=False, verbose=2, nb_max_episode_steps=300)
+#history = dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
 #学習の様子を描画したいときは、Envに_render()を実装して、visualize=True にします,
 
 import rl.callbacks
@@ -114,4 +114,6 @@ for obs in cb_ep.observations.values():
     plt.plot([o[0] for o in obs])
 plt.xlabel("step")
 plt.ylabel("pos")
-
+plt.pause(3)
+plt.savefig('plot_epoch_{0:03d}_dqn.png'.format(50000), dpi=60)
+plt.close()
