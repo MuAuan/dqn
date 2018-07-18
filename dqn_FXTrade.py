@@ -2,6 +2,8 @@
 
 import enum
 import numpy as np
+
+sin_original = []
 class Action(enum.Enum):
     SELL = 2
     HOLD = 0
@@ -49,9 +51,14 @@ class FXTrade(gym.core.Env):
 
         self._sin_list = []
         k=0.05
+        i=0
         for t in np.linspace(0, 48, 240):
             self._sin_list.append(np.sin(t)*np.exp(-k*t)+0.1*randn())
+            #self._sin_list.append(np.sin(t))
+        for i in range(len(self._sin_list)):
+            sin_original.append(self._sin_list[i])
         self.cur_id = 0
+        
 
     def step(self, action):
         bid = self._sin_list[self.cur_id]
@@ -107,7 +114,7 @@ dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory,
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 # トレーニングを開始。同じ正弦曲線を9600 = 240 x 400回 回す。
-histry = dqn.fit(env, nb_steps=1600, visualize=False, verbose=1)
+histry = dqn.fit(env, nb_steps=9600, visualize=False, verbose=1)
 
 # トレーニング結果を確認
 dqn.test(env, nb_episodes=5, visualize=False)
@@ -138,9 +145,33 @@ dqn.test(env, nb_episodes=10, visualize=False, callbacks=[cb_ep])
 import matplotlib.pyplot as plt
 
 for obs in cb_ep.observations.values():
-    plt.plot([o[0] for o in obs])
+    plt.plot([o[0] for o in obs],"r")
+t = np.linspace(0,240,240)
+plt.plot(t,sin_original,"b")    
 plt.xlabel("step")
 plt.ylabel("pos")
 plt.pause(3)
-plt.savefig('plot_epoch_{0:03d}_FXTrade_dqn.png'.format(50000), dpi=60)
+plt.savefig('plot_epoch_{0:03d}_FXTrade_dqn.png'.format(9600), dpi=60)
+plt.close()
+
+print('Plotting Results')
+plt.subplot(2, 1, 1)
+plt.title('Original')
+t = np.linspace(0,240,240)
+plt.plot(t,sin_original,"b")    
+plt.xlabel("step")
+plt.ylabel("pos")
+plt.pause(3)
+
+plt.subplot(2, 1, 2)
+plt.title('observations&original')
+for obs in cb_ep.observations.values():
+    plt.plot([o[0] for o in obs],"r")
+t = np.linspace(0,240,240)
+plt.plot(t,sin_original,"b")    
+plt.xlabel("step")
+plt.ylabel("pos")
+plt.pause(3)
+
+plt.savefig('plot_epoch_{0:03d}_FXTrade_obvs&original.png'.format(9600), dpi=60)
 plt.close()
