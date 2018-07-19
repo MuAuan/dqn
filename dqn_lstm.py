@@ -80,7 +80,7 @@ class Network(object):
         self.model = None
 
     def sample_model(self, observation_space):
-        
+        """
         model = Sequential()
         model.add(Flatten(input_shape=(1,) + observation_space.shape))
         model.add(Dense(16))
@@ -92,7 +92,7 @@ class Network(object):
         model.add(Dense(n_action))
         model.add(Activation('linear'))
         print(model.summary())
-        
+        """
         """
         model = Sequential()
         model.add(Reshape(observation_space.shape,
@@ -106,19 +106,19 @@ class Network(object):
         #model.add(Dropout(0.6))
         model.add(Dense(n_action))
         model.add(Activation('linear'))
-        """
+        
         """
         model = Sequential()
         model.add(Reshape(observation_space.shape,
                       input_shape=(1,)+observation_space.shape))
-        model.add(LSTM(16, input_shape=(3, 2), 
+        model.add(LSTM(1, input_shape=(3, 2), 
                #batch_size=25,
                return_sequences=False,
                #stateful=True,
               dropout=0.0))
         model.add(Dense(n_action))
         model.add(Activation('linear'))
-        """
+        
         print(model.summary())
         self.model = model
         return model        
@@ -204,6 +204,19 @@ Total params: 707
 Trainable params: 707
 Non-trainable params: 0
 _________________________________________________________________
+model = Sequential()
+model.add(Flatten(input_shape=(1,) + observation_space.shape))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(n_action))
+model.add(Activation('linear'))
+
+[1000 rows x 5 columns]
+335.545417366 297.043598361
 
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #
@@ -228,19 +241,96 @@ Total params: 779
 Trainable params: 779
 Non-trainable params: 0
 _________________________________________________________________
-
 model = Sequential()
-        model.add(Reshape(observation_space.shape,
-                      input_shape=(1,)+observation_space.shape))
-        model.add(LSTM(16, input_shape=(3, 2), 
-               #batch_size=25,
-               return_sequences=False,
-               #stateful=True,
-              dropout=0.0))
-        model.add(Dense(n_action))
-        model.add(Activation('linear'))
+model.add(Reshape(observation_space.shape,
+          input_shape=(1,)+observation_space.shape))
+model.add(LSTM(LAG))
+model.add(Dense(32))
+model.add(Activation('relu'))
+#model.add(Dropout(0.6))
+model.add(Dense(16))
+model.add(Activation('relu'))
+#model.add(Dropout(0.6))
+model.add(Dense(n_action))
+model.add(Activation('linear'))
 
 [1000 rows x 5 columns]
-345.331418387 298.854889973
+327.510168468 281.55027727
 
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+reshape_1 (Reshape)          (None, 3, 2)              0
+_________________________________________________________________
+lstm_1 (LSTM)                (None, 16)                1216
+_________________________________________________________________
+dense_1 (Dense)              (None, 3)                 51
+_________________________________________________________________
+activation_1 (Activation)    (None, 3)                 0
+=================================================================
+Total params: 1,267
+Trainable params: 1,267
+Non-trainable params: 0
+_________________________________________________________________
+
+model = Sequential()
+model.add(Reshape(observation_space.shape,
+          input_shape=(1,)+observation_space.shape))
+model.add(LSTM(16, input_shape=(3, 2), 
+          #batch_size=25,
+          return_sequences=False,
+          #stateful=True,
+          dropout=0.0))
+model.add(Dense(n_action))
+model.add(Activation('linear'))
+[1000 rows x 5 columns]
+345.331418387 298.854889973 86.5%
+
+model.add(LSTM(32, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+326.896818527 287.023391603 87.8%
+
+model.add(LSTM(50, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+335.379218148 303.076981308 90.4%
+
+model.add(LSTM(100, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+328.441805231 294.693690424 89.7%
+
+model.add(LSTM(8, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+329.994805214 294.041772751 89.1%
+
+model.add(LSTM(3, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+337.117534809 288.436002881
+
+model.add(LSTM(1, input_shape=(3, 2), 
+         #batch_size=25,
+         return_sequences=False,
+         #stateful=True,
+         dropout=0.0))
+[1000 rows x 5 columns]
+328.175843047 274.522273872
 """
